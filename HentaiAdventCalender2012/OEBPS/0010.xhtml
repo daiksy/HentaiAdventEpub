@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<title>day09</title>
+<link rel="stylesheet" href="css/default.css" type="text/css" />
+</head>
+<body>
+<h3>day09</h3>
+<h1>変態に知ってもらいたい、変態が重要な理由</h1><br/>
+<br/>
+    昨日、知り合いのブログ検索したんです。ブログ検索。<br/>
+    そしたらなんか人がめちゃくちゃいっぱい出てきて辿り着けないんです。<br/>
+    で、よく見たらなんか題名に、●●アドベントカレンダー　●日目、とか書いてあるんです。<br/>
+    もうね、アホかと。馬鹿かと。<br/>
+    お前らな、アドベントカレンダー如きで普段月一でも書いないブログ更新してんじゃねーよ、ボケが。<br/>
+    アドベントカレンダーだよ、アドベントカレンダー。<br/>
+    なんか親子連れとかもいるし。一家４人でブログか。おめでてーな。<br/>
+    よーしパパはてなダイアリー更新しちゃうぞー、とか言ってるの。もう見てらんない。<br/>
+    お前らな、アフィリンク踏んでやるからその席空けろ。<br/>
+    ブログってのはな、もっと殺伐としてるべきなんだよ。<br/>
+    ブログを見に来た奴といつ喧嘩が始まってもおかしくない、<br/>
+    刺すか刺されるか、そんな雰囲気（例えば高木大先生に目をつけられる）がいいんじゃねーか。女子供は、すっこんでろ。<br/>
+    で、やっと更新したかと思ったら、隣の奴が、俺は技術系のブログで、とか言ってるんです。<br/>
+    そこでまたぶち切れですよ。<br/>
+    あのな、技術系のブログなんてきょうび流行んねーんだよ。ボケが。<br/>
+    得意げな顔して何が、技術系のブログで、だ。<br/>
+    お前は本当に技術系のブログを書きたいのかと問いたい。問い詰めたい。小１時間問い詰めたい。<br/>
+    お前、技術系のブログって言いたいだけちゃうんかと。<br/>
+    ブログ通の俺から言わせてもらえば今、ブログ通の間での最新流行はやっぱり、<br/>
+    変態、これだね。<br/>
+    変態アドベントカレンダー。これが通のブログ更新。<br/>
+    変態アドベントカレンダーってのは変態を自分で宣言する。そん代わりパンピーには戻れない。これ。<br/>
+    で、それにおっぱい（巨乳）。これ最強。<br/>
+    しかしこれをするとと次からいろふさんにマークされるという危険も伴う、諸刃の剣。<br/>
+    素人にはお薦め出来ない。<br/>
+    まあお前らド素人は、アメブロでもやってなさいってこった。<br/>
+<br/>
+<br/>
+ということでこのブログは<a href="http://atnd.org/events/33835">HENTAI Advent Calendar 2012</a> 9日目です。<br/>
+前日は<a href="http://tango.hatenablog.com/about">tan_go238</a>さんの<br/>
+<a href="http://tango.hatenablog.com/entry/2012/12/08/190901">みんなが大好きないろふさんをSVGでざっくり書いてみた</a><br/>
+でした。<br/>
+いろふさんの人気に全俺が嫉妬しつつも変態アドベントカレンダーのレベルの高さに泣きそうです。<br/>
+そして今日も変態な話が聞ける、そう思ってるお前の幻想をぶち壊す！！<br/>
+ってことで今日は会社の優しい先輩がFBの近況にある話題の「今どんな気持ち？」を書き換えるJSを書いてたのでソレを使って気持ち良くなろうと思います。<br/>
+つかアドベントカレンダー更新連続3日目とか何もかも燃え尽きますね。<br/>
+みなさんもスケジュールは計画的に。<br/>
+<br/>
+で<a href="http://maepon.skpn.com/web/entry-27.html">元ネタ</a>。<br/>
+心優しい先輩が変態のためのJSを書いてくれてたので晒します。<br/>
+<br/>
+<figure id="code9-1"><pre><code class="javascript">
+// ==UserScript==
+// @name        　kimochinakadoudemoeeyan
+// @namespace   https://www.facebook.com/
+// @description facebookで出てくる「今どんな気持ち？」を消す。
+// @include     https://www.facebook.com/*
+// @exclude     https://www.facebook.com/ai.php*
+// ==/UserScript==
+ 
+var tA = null,iT = 0,c = 0,str = &apos; &apos;;
+ 
+function checkPl(){
+ console.log(&apos;check&apos;)
+ if(document.querySelector(&apos;textarea[placeholder=&quot;今どんな気持ち？&quot;]&apos;)){
+  tA = document.querySelector(&apos;textarea[placeholder=&quot;今どんな気持ち？&quot;]&apos;);
+  tA.value = str;
+  tA.setAttribute(&apos;placeholder&apos;,str);
+  c++;
+ }
+}
+checkPl();
+iT = setInterval(checkPl,500); 
+</code></pre></figure>
+<br/>
+<br/>
+これわざわざ９行目のstrの好きな文字突っ込める仕様じゃないですかー（ゲス顔<br/>
+動作確認は後輩の勤め、ということでまずは推奨環境のChromeで。<br/>
+Facebookにログインした状態でF12を押して開発者ツールを起動。<br/>
+コンソールに上記のJSをベコっと貼り付けてstrの変数に任意の文字をハメて見ましょう。<br/>
+<br/>
+<img src="images/hentainow.png" alt="画像1" /><br/>
+<br/>
+こ、こいつ、動くぞッ！？　#ファースト見たことありません<br/>
+ということで次はFirefox。<br/>
+<a href="https://addons.mozilla.org/ja/firefox/addon/greasemonkey/">グリモン</a>入れて実行してみましょう。<br/>
+<br/>
+<img src="images/hentainow_FF.png" alt="画像2" /><br/>
+<br/>
+普通に動いてしまいました。<br/>
+では最後の関門、我らの？IE！！（検証では9です、つかIEは8以下は滅んでください）<br/>
+IEもF12を押して開発者ツールを起動させてスクリプトの欄でコピペして実行です。<br/>
+<br/>
+<img src="images/IE.png" alt="画像3" /><br/>
+<br/>
+なんの楽しみも無く普通に動いてしまいましたｗ<br/>
+と言うことでお好みのJSを気軽にメジャーブラウザで実行出来るというお話でした（）<br/>
+<br/>
+それでは明日は<a href="http://mikeneck.blogspot.jp/">mike_neck</a>さんです。<br/>
+どんな変態的なお話が聞けるか楽しみですね！！<br/>
+<br/>
+
+</body>
+</html>
+

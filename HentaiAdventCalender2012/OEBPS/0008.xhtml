@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<title>day07</title>
+<link rel="stylesheet" href="css/default.css" type="text/css" />
+</head>
+<body>
+<h3>day07</h3>
+<h1>AdventCalendarのPost数から変態ランキングを作る</h1><br/>
+<br/>
+Dec 7th, 2012<br/>
+<br/>
+このエントリは <a href="http://atnd.org/events/33835">HENTAI Advent Calendar 2012 - 変態アドベントカレンダー -</a> の7日目です。<br/>
+<br/>
+前日は <a href="http://twitter.com/ponkore">@ponkore</a> さんの <a href="https://gist.github.com/4216377">Clojure から POI ってみる</a> でした。<br/>
+<br/>
+<h2>本題</h2><br/>
+<br/>
+さて、この変態アドベントカレンダー、 <a href="http://atnd.org/events/22020">変態アドベントカレンダー 2011</a> 、 <a href="http://atnd.org/events/29918">変態アドベントカレンダー in Summer</a> に引き続き3回目になります。 前2回に関しては枠が埋まらなかったので、参加者が2周3周して賑やかしてました。(それでも埋まらなかったですが)<br/>
+<br/>
+で、気になるのは「誰が一番変態アドベントカレンダーに記事を一番多くPostしているのか」ということです。 つまり変態オブ変態です。<br/>
+<br/>
+手動で集計したほうが早い気はするんですが、折角なのでスクリプトを書いてみました。<br/>
+<br/>
+<h2>集計方法</h2><br/>
+<br/>
+2011、2012夏に関しては、コメントから投稿者を引っ張り出してやればよさげです。 幸いコメントがRSSで取得できるため、ここから投稿者を抽出します。<br/>
+<br/>
+2012冬に関してはdescriptionに書いてあるテーブルから担当者を引っ張り出すことにします。<br/>
+<br/>
+<h2>コード</h2><br/>
+<br/>
+<figure id="code7-1"><pre><code class="scala">
+#!/usr/bin/env xsbtscript
+!#
+
+/***
+scalaVersion := &quot;2.9.2&quot;
+*/
+
+import scala.xml.XML
+import scala.io.Source
+
+val encode = &quot;utf8&quot;
+
+def fromRSS(url: String) = {
+  XML.loadString(Source.fromURL(url, encode).getLines.mkString) \\ &quot;author&quot; map (_.text)
+}
+
+def fromDescription(url: String) ={
+  val descriptions = XML.loadString(Source.fromURL(url, encode).getLines.mkString) \\ &quot;description&quot; map (_.text)
+  for (i &lt;- 1 to 25) yield (&quot;12/&quot; + i + &quot;\\|.+?\\|&quot;).r.findFirstIn(descriptions(0)).get.split(&quot;\\|&quot;)(1)
+}
+
+val hac2011w = fromRSS(&quot;http://atnd.org/comments/22020.rss&quot;)
+val hac2012s = fromRSS(&quot;http://atnd.org/comments/29918.rss&quot;)
+val hac2012w = fromDescription(&quot;http://api.atnd.org/events/?event_id=33835&quot;)
+val hac = hac2011w ++ hac2012s ++ hac2012w
+
+val cnt = (Map.empty[String, Int] /: hac) { (r, e) =&gt;
+  r + (e -&gt; (r.getOrElse(e, 0) + 1))
+}
+
+for (t &lt;- cnt.toSeq.sortWith(_._2 &gt; _._2)) println(t)
+</code></pre></figure>
+<br/>
+<h2>実行結果</h2><br/>
+<br/>
+<figure id="code7-1"><pre><code class="samp">
+(もじゃ変,7)
+(backpaper0,6)
+(KASUYA, Daisuke,5)
+(Kuchitama,5)
+(dproject21,4)
+(s_kozake,4)
+(issps2009,3)
+(真っ赤なレモン,3)
+(soudai1025,3)
+(susumuishigami,2)
+(winplus,2)
+(dekokun,2)
+(megascus,2)
+(toshi__ya,2)
+(hakurai,2)
+(tanago238,2)
+(bufferings,2)
+(daiksy,1)
+(N.Murakami,1)
+(KTZ ,1)
+(posaunehm,1)
+(zephiransas,1)
+(jyukutyo,1)
+(はがねのつるぎ,1)
+(tango238,1)
+(nyaarto,1)
+(sudai1025,1)
+(kuchitama,1)
+(miya2000,1)
+(satohjohn,1)
+(?,1)
+(mike_neck,1)
+(組　長,1)
+(s_taichan,1)
+(ponkore,1)
+(zerosum_,1)
+(ryosms,1)
+(kshoji,1)
+(dpoject21,1)
+(inaton,1)
+</code></pre></figure>
+<br/>
+<h1>俺だった。</h1><br/>
+<br/>
+あ、因みに2012冬のdescriptionがATNDのユーザ名と違うためにバラけてる部分もありますね。 まあその辺はあんま気にしないでください。<br/>
+<br/>
+<h2>最後に</h2><br/>
+<br/>
+日は <a href="https://twitter.com/tan_go238">たんご</a> さんです。<br/>
+<br/>
+
+</body>
+</html>
+

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<title>day24</title>
+<link rel="stylesheet" href="css/default.css" type="text/css" />
+</head>
+<body>
+<h3>day24</h3>
+<h1>■[Java]読める！クラスファイルAdd Starmegascuskakkun61</h1><br/>
+<br/>
+この記事は変態アドベントカレンダーの24日目です。<br/>
+<br/>
+23日目はkshojiさんの<a href="http://blog.kshoji.jp/2012/12/tas-coding.html">実機TAS-codingコントローラを作る</a>でした。<br/>
+<br/>
+<a href="http://cdn-ak.f.st-hatena.com/images/fotolife/h/hakurai/20121224/20121224182033.png?1356341018"><img src="images/__________2012-11-03_23.31.02_original.png" alt="KPT!KPT!" /></a><br/>
+<br/>
+さて、周りの変態たちを見ていると、事あるごとにクラスファイルを逆アセンブルするのが嗜みのようなのでこのエントリではクラスファイルについて解説します。<br/>
+<br/>
+まずは以下の様なクラスを準備してコンパイルしましょう！<br/>
+<br/>
+<figure id="code24-1"><pre><code class="java">
+package adventcalendar.hentai;
+
+public class Hentai {
+
+    public static void main(String[] args) {
+        System.out.println(&quot;Hello bytecode!&quot;);
+    }
+
+}
+</code></pre></figure>
+<br/>
+<br/>
+そして出来上がった.classファイルをSublime Text2で開いたのがこちらです。エディターは適当なバイナリエディタでもOKです。<br/>
+<br/>
+<figure id="code24-2"><pre><code class="samp">
+cafe babe 0000 0031 0022 0a00 0600 1409
+0015 0016 0800 170a 0018 0019 0700 1a07
+001b 0100 063c 696e 6974 3e01 0003 2829
+5601 0004 436f 6465 0100 0f4c 696e 654e
+756d 6265 7254 6162 6c65 0100 124c 6f63
+616c 5661 7269 6162 6c65 5461 626c 6501
+0004 7468 6973 0100 1e4c 6164 7665 6e74
+6361 6c65 6e64 6172 2f68 656e 7461 692f
+4865 6e74 6169 3b01 0004 6d61 696e 0100
+1628 5b4c 6a61 7661 2f6c 616e 672f 5374
+7269 6e67 3b29 5601 0004 6172 6773 0100
+135b 4c6a 6176 612f 6c61 6e67 2f53 7472
+696e 673b 0100 0a53 6f75 7263 6546 696c
+6501 000b 4865 6e74 6169 2e6a 6176 610c
+0007 0008 0700 1c0c 001d 001e 0100 0f48
+656c 6c6f 2062 7974 6563 6f64 6521 0700
+1f0c 0020 0021 0100 1c61 6476 656e 7463
+616c 656e 6461 722f 6865 6e74 6169 2f48
+656e 7461 6901 0010 6a61 7661 2f6c 616e
+672f 4f62 6a65 6374 0100 106a 6176 612f
+6c61 6e67 2f53 7973 7465 6d01 0003 6f75
+7401 0015 4c6a 6176 612f 696f 2f50 7269
+6e74 5374 7265 616d 3b01 0013 6a61 7661
+2f69 6f2f 5072 696e 7453 7472 6561 6d01
+0007 7072 696e 746c 6e01 0015 284c 6a61
+7661 2f6c 616e 672f 5374 7269 6e67 3b29
+5600 2100 0500 0600 0000 0000 0200 0100
+0700 0800 0100 0900 0000 2f00 0100 0100
+0000 052a b700 01b1 0000 0002 000a 0000
+0006 0001 0000 0003 000b 0000 000c 0001
+0000 0005 000c 000d 0000 0009 000e 000f
+0001 0009 0000 0037 0002 0001 0000 0009
+b200 0212 03b6 0004 b100 0000 0200 0a00
+0000 0a00 0200 0000 0600 0800 0700 0b00
+0000 0c00 0100 0000 0900 1000 1100 0000
+0100 1200 0000 0200 13
+</code></pre></figure>
+<br/>
+まずは最初の4バイトの cafe babeは、このファイルがjavaのクラスファイルだということを表すマジックナンバーです。 あ、あとクラスファイルのバイナリはビッグエンディアンですね。<br/>
+<br/>
+<figure id="code24-3"><pre><code class="samp">
+cafe babe 
+</code></pre></figure>
+<br/>
+続く4バイト 0000 0031 はクラスファイルのマイナーバージョンとメジャーバージョンを表します。マイナーバージョンは 0 メジャーバージョンは 49 なのでJava5ですね。<br/>
+<br/>
+<figure id="code24-4"><pre><code class="samp">
+0022
+</code></pre></figure>
+<br/>
+次の2バイトはコンスタントプール内のエントリ数を表します。ここからあとに 34 - 1 コ分のエントリが続きます。コンスタントプールの0番目はJVM側で予約されているためクライスファイル内では1番目から始まります。<br/>
+<br/>
+<figure id="code24-5"><pre><code class="samp">
+0a
+</code></pre></figure>
+<br/>
+ここからコンスタントプールの定義です。まず最初の2バイトはこのコンスタントプール構造体のtagを示します。<br/>
+<br/>
+0x0a　は 10なので CONSTANT_Methodref ですね。<br/>
+<br/>
+CONSTANT_Methodrefは以下のように定義されています。<br/>
+<br/>
+<figure id="code24-6"><pre><code class="jvaamp">
+CONSTANT_Methodref_info {
+    u1 tag;
+    u2 class_index;
+    u2 name_and_type_index;
+}
+</code></pre></figure>
+<br/>
+なので、続く2バイトはこのメソッドの定義されたクラスを表す CONSTANT_Class のコンスタントプール内のインデックスです。<br/>
+<br/>
+<figure id="code24-7"><pre><code class="samp">
+00 06
+</code></pre></figure>
+<br/>
+なので、6 です。<br/>
+<br/>
+続く2 バイトはこのメソッドのシグネチャを表す CONSTANT_NameAndType のコンスタントプール内のインデックスです。<br/>
+<br/>
+<figure id="code24-8"><pre><code class="samp">
+14
+</code></pre></figure>
+<br/>
+なので、20です。<br/>
+<br/>
+私は変態じゃないのでそろそろ辛くなって来ました。そもそもjavapすればいいと思います。気になる人だけJava仮想マシン仕様を見ながら読み進めてみましょう！「jvm spec」などでググれば出てくると思います。<br/>
+<br/>
+最後に、明日はクリスマスということでバイトコード大好きな変態さん達にクリスマスプレゼントを用意しました。ぜひ遊んでみてくださいね！<br/>
+<br/>
+<a href="http://hakurai.github.com/javap.js/web/">WE LOVE JAVA BYTECODE</a><br/>
+<br/>
+クラスファイルを開くとこんなかんじで見れます。これなら読める！<br/>
+<br/>
+<img src="images/20121224194940.png" alt="画像1" /><br/>
+<br/>
+github はこちら。<br/>
+<br/>
+<a href="https://github.com/hakurai/javap.js">hakurai/javap.js GitHub</a><br/>
+<br/>
+次は@toshi__yaさんです。<br/>
+<br/>
+
+</body>
+</html>
+

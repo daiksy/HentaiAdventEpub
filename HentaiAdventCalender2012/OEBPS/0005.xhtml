@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<title>day04</title>
+<link rel="stylesheet" href="css/default.css" type="text/css" />
+</head>
+<body>
+<h3>day04</h3>
+ <h1>Vimを変態にしてみた</h1><br/>
+<br/>
+このエントリは、<a href="http://atnd.org/events/33835">変態アドベントカレンダー2012</a>の4日目です。一日目は<a href="http://twitter.com/backpaper0">@backpaper0</a>さんの「<a href="http://d.hatena.ne.jp/backpaper0/20121203/1354550582">ノムリッシュJavaで厨二プログラミング</a>」でした。<br/>
+<br/>
+いよいよ12月になりアドベントカレンダーシーズンに入りましたが、みなさんブログ書いてますか？<br/>
+<br/>
+まだアドベントカレンダーに参加していない方は、是非参加しましょう。<br/>
+<br/>
+自分の持ってる暗黙的なノウハウを外化する絶好の機会です。<br/>
+<br/>
+とはいえ、ブログ記事を書くのって結構大変ですよね。<br/>
+<br/>
+しかし、我々ITエンジニアは日々ソースコードを書きまくっている経験から、「記述を効率化する術」を持っているはずです。<br/>
+<br/>
+そう、コード補完です！<br/>
+<br/>
+今回は、協力な補完機能を提供してくれるvimプラグインのNeoCompleCacheとNeoSnippetを紹介しつつ、さらに変態アドベントカレンダー向けに補完設定を作ってみます。<br/>
+<br/>
+Vimmerな変態の方も、変態なVimmerの方も、Vimmerでない変態の方も、ぜひご活用ください。<br/>
+<br/>
+<h2>下準備</h2><br/>
+<br/>
+NeoCompleCacheとNeoSnippetはプレフィクスにNeoとついている事からわかるように、どちらもShougoさんによるVimプラグインです。<br/>
+<br/>
+非常に強力な補完機能でvimによる作業を支援してくれます。<br/>
+<br/>
+もともとはNeoCompleCacheだけだったのですが、バージョンを重ねるごとに機能が追加されていき、NeoCompleCacheのバージョン7からそれぞれ別のPluginに分割されました。<br/>
+<br/>
+国産プラグインなので日本語のインストール手順はそろっているだろうと思ったら、あらまぁ無いじゃないですか！しかも、NeoCompleCacheとNeoSnippetでGitHubに書いてあるインストール手順がズレてる。もういっそ全部まとめてまるっと手順を書いちゃいます。<br/>
+<br/>
+<h2>プラグインの取得</h2><br/>
+<br/>
+とりあえず、NeoSnippet公式のインストール方法に従って、NeoBundleをインストールして、NeoBundle経由でNeoCompleCacheとNeoSnippetをインストールします。<br/>
+<br/>
+NeoBundleのインストール方法については、<a href="http://qiita.com/items/68b6b5d5ed40f6f96310">こちら</a>にまとめました。<br/>
+<br/>
+で、NeoBundleがインストールできてさえしまえば後は簡単です。<br/>
+<br/>
+.vimrcに以下を追記して、<br/>
+<br/>
+<figure id="code4-1"><pre><code class="vimscript">
+NeoBundle &apos;Shougo/neocomplcache.git&apos;
+NeoBundle &apos;Shougo/neosnippet.git&apos;
+</code></pre></figure>
+<br/>
+vimを立ち上げて次のコマンドを実行するだけ<br/>
+<br/>
+<figure id="code4-2"><pre><code class="vimscript">
+:NeoBundleInstall
+</code></pre></figure>
+<br/>
+これで、NeoCompleCacheとNeoSnippetがインストールできます。<br/>
+<br/>
+お手軽ですね。<br/>
+<br/>
+<h2>設定</h2><br/>
+<br/>
+インストールできたら、それぞれの設定です。<br/>
+<br/>
+次の内容を.vimrcに追記したらOKです。<br/>
+<br/>
+本当はいろいろ設定できるのですが、とりあえず最低限の設定だけ。<br/>
+<br/>
+<figure id="code4-3"><pre><code class="vimscript">
+&quot;--------------------------------------------------------------------------
+&quot; neocomplcache
+let g:neocomplcache_enable_at_startup = 1
+
+&quot; Enable omni completion. Not required if they are already set elsewhere in .vimrc
+autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+</code></pre></figure>
+<br/>
+<figure id="code4-4"><pre><code class="vimscript">
+&quot;--------------------------------------------------------------------------
+&quot; neosnippet
+
+&quot; Plugin key-mappings.
+imap &lt;C-k&gt;     &lt;Plug&gt;(neosnippet_expand_or_jump)
+smap &lt;C-k&gt;     &lt;Plug&gt;(neosnippet_expand_or_jump)
+
+&quot; SuperTab like snippets behavior.
+imap &lt;expr&gt;&lt;TAB&gt; neosnippet#expandable() ? &quot;\&lt;Plug&gt;(neosnippet_expand_or_jump)&quot; : pumvisible() ? &quot;\&lt;C-n&gt;&quot; : &quot;\&lt;TAB&gt;&quot;
+smap &lt;expr&gt;&lt;TAB&gt; neosnippet#expandable() ? &quot;\&lt;Plug&gt;(neosnippet_expand_or_jump)&quot; : &quot;\&lt;TAB&gt;&quot;
+
+&quot; For snippet_complete marker.
+if has(&apos;conceal&apos;)
+  set conceallevel=2 concealcursor=i
+endif
+</code></pre></figure>
+<br/>
+<h1>いよいよvimを変態にする</h1><br/>
+<br/>
+<h2>VimにHentaiファイルタイプを認識させる</h2><br/>
+<br/>
+では、ブログ記事作成を便利にするsnipet作成に入りましょう。<br/>
+<br/>
+今回は、textファイルを補完するために、.txtの拡張子のファイルをhentaiファイルタイプとして扱います。<br/>
+<br/>
+ファイルタイプをvimに登録するには、.vim以下にftdetectフォルダを作り、そこにファイルタイプ判別のvimスクリプトを追加します。<br/>
+<br/>
+今回は、下記のファイルを追加しました。<br/>
+<br/>
+<figure id="code4-5"><pre><code class="vimscript">
+au BufRead,BufNewFile *.txt set filetype=hentai
+</code></pre></figure>
+<br/>
+これで、vimは.txtを拡張子に持つファイルを開いたときにファイルタイプをhentaiファイルタイプとして認識してくれます。<br/>
+<br/>
+<h2>vimにHentai辞書を追加する</h2><br/>
+<br/>
+NeoCompleCacheは、ユーザ定義の辞書ファイルを追加する事ができ、追加した辞書ファイルを元に単語補完を行う事が出来ます。<br/>
+<br/>
+今回は、適当に変態アドベントカレンダーに登場しそうな単語と変態アドベントカレンダー参加者の名前を登録したhentai.dictを作りました。<br/>
+<br/>
+辞書ファイルのパスは自由に設定出来るので、今回はとりあえず.vim以下にdictフォルダを作成し、その中に保存しました。<br/>
+<br/>
+<figure id="code4-6"><pre><code class="vimscript">
+変態
+hentai_advent
+daiksy
+dpoject21
+backpaper0
+kuchitama
+はがねのつるぎ
+_funya
+ponkore
+もじゃ変
+razon
+tango238
+sudai1025
+mike_neck
+bufferings
+ryosms
+s_taichan
+issps2009
+jyukutyo
+s_kozake
+ktz_alias
+KTZ
+posaune
+posaunehm
+アドベントカレンダー
+IT
+エンジニア
+</code></pre></figure>
+<br/>
+僕がatndから抜き出すタイミングで名前が載ってない人がいるかもしれません。<br/>
+<br/>
+別に、変態認定してないわけではないです。<br/>
+<br/>
+この変態辞書を NeoCompleCache に読み込ませるために.vimrcに下記を追記します。<br/>
+<br/>
+<figure id="code4-7"><pre><code class="vimscript">
+&quot;辞書の登録
+let g:neocomplcache_dictionary_filetype_lists = {
+  \ &apos;default&apos; : &apos;&apos;,
+  \ &apos;hentai&apos; : $HOME.&apos;/.vim/dict/hentai.dict&apos;,
+  \ }
+</code></pre></figure>
+<br/>
+これでvimを起動すると、変態辞書による補完が有効になります。<br/>
+<br/>
+hを入力して&lt;Ctrl&gt;+n を押すと、入力候補が表示されます。<br/>
+<img src="images/20121204235713.png" alt="画面1" /><br/>
+<br/>
+<h2>vimに変態Snippetを登録する</h2><br/>
+<br/>
+さらに、vimを変態アドベントカレンダー向けにカスタマイズしていきましょう。<br/>
+<br/>
+NeoSnippet を利用する事で、スニペット補完が出来るようになります。<br/>
+<br/>
+スニペット補完とは、よく書く定型文のひな形を用意しておいて、その一部だけを書き換える事で記述効率をあげる補完手法です。<br/>
+<br/>
+Snippetについてはこちらの記事が詳しいです。<br/>
+<br/>
+<a href="http://kazuph.hateblo.jp/entry/2012/11/28/105633">Vimのsnippetについてあまり知らなかったので設定してみたら便利過ぎてつらい</a><br/>
+<br/>
+今回は、変態アドベントカレンダーのテンプレートを登録するために、hentai.snipファイルを作成します。<br/>
+<br/>
+<figure id="code4-8"><pre><code class="vimscript">
+snippet hentai_advent
+alias ha
+このエントリは、&lt;a href=&quot;http://atnd.org/events/33835&quot;&gt;変態アドベントカレンダー2012&lt;/a&gt;の${1:DATE}日目です。一日目は${2:WHO}さんの「${3:PREV_TITLE}」でした。
+${0:TARGET}
+
+明日は${4:WHO_NEXT}さんです。
+
+snippet hentai_link
+alias hl
+        &lt;a href=&quot;http://atnd.org/events/33835&quot;&gt;変態アドベントカレンダー2012&lt;/a&gt;
+
+snippet @daiksy
+alias daiksy
+        &lt;a href=&quot;http://twitter.com/daiksy&quot;&gt;@daiksy&lt;/a&gt;
+
+snippet hashtag
+alias ht
+        &lt;a href=&quot;https://twitter.com/search?q=%23hentai_advent&amp;src=hash&quot;&gt;hentai_advent&lt;/a&gt;
+</code></pre></figure>
+<br/>
+.vimフォルダ以下にsnippetsフォルダを作って、このhentai.snipファイルを保存します。<br/>
+<br/>
+このファイルを読み込むための.vimrcの設定はこちら<br/>
+<br/>
+<figure id="code4-9"><pre><code class="vimscript">
+&quot; スニペットファイルの保存ディレクトリのパスを登録
+let g:neosnippet#snippets_directory=&apos;~/.vim/bundle/snipmate-snippets/snippets&apos;
+</code></pre></figure>
+<br/>
+これで、変態アドベントカレンダーのひな形が登録出来ました。<br/>
+<br/>
+haと入力して&lt;Ctrl&gt;+kを打ち込むと、記事のひな形が出来上がります。<br/>
+<br/>
+<img src="images/20121204235714.png" alt="画面2" /><br/>
+<br/>
+更に、&lt;Tab&gt;で入力が必要な箇所に移動して書き換える事が出来ます。<br/>
+<br/>
+<img src="images/20121204235715.png" alt="画面3" /><br/>
+<br/>
+<h2>まとめ</h2><br/>
+<br/>
+これで変態アドベントカレンダーの記事作成が大幅に効率化されました。<br/>
+<br/>
+もちろん、この設定は工夫次第で普段のコーディングにも適用出来ます。<br/>
+<br/>
+みなさんも、NeoCompleCacheとNeoSnippetを用いてより快適なvimライフを送ってください。<br/>
+<br/>
+今回作成した、hentai.vim、hentai.dict、hentai.snipについてはgistに挙げているのでよろしければ参考にしてください。<br/>
+<br/>
+<a href="https://gist.github.com/4204946">Gist - vimを変態にするための設定ファイル群</a><br/>
+<br/>
+明日は<a href="http://twitter.com/_funya">はがねのつるぎ</a>さんです。<br/>
+<br/>
+
+</body>
+</html>
+

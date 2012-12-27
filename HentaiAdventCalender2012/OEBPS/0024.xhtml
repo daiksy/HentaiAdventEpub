@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<title>day23</title>
+<link rel="stylesheet" href="css/default.css" type="text/css" />
+</head>
+<body>
+<h3>day23</h3>
+<h1>[変態Advent Calendar] 実機TAS-codingコントローラを作る</h1><br/>
+<br/>
+<a href="http://mbed.org/users/kshoji/code/NESBot/">ファミコン用実機TASコントローラ</a>とかも作っているkshojiです。<br/>
+<a href="http://atnd.org/events/33835">変態Advent Calendar</a>へは初参戦となります。やらしくお願いします。<br/>
+<br/>
+<h2>TASとは?</h2><br/>
+→ 詳しくは<a href="http://dic.nicovideo.jp/a/tas">ニコニコ大百科のTASの項目</a>あたりがオススメです。<br/>
+<br/>
+大雑把に言えば「最速でゲームをクリアする」ために必要な再現用データを作る、という競技です。<br/>
+RAM書き換えなどのズルをしていないので<b>「実機で再現できる」</b>というのがポイントです。<br/>
+実機で再現できるので、つまり、<b>実際に実機で再生させるプロジェクト</b>というのもいくつか存在します。<br/>
+<br/>
+<h2>実機TASコントローラを作ろう</h2><br/>
+以前、<a href="http://mbed.org/users/kshoji/code/NESBot/">ファミコン実機でTASるコントローラ</a>を作ったこともあり、その連想でなにか出来ないか模索してみました。<br/>
+<br/>
+今回はエンジニア向けっぽい変態ネタということで、Tool Assisted Speed-<b>coding</b>のコントローラを作ってみます。<b>coding</b>でもあり、<b>typing</b>でもありますが。<br/>
+「自動キー入力するUSBキーボード」を自作する感じになります。<br/>
+<br/>
+ちなみに今回のTASのルールとしては、プログラムのソースコードを入力し終わるまで、としています。<br/>
+<br/>
+まずは、完成したものがこちらにあるので、動画を観てみましょう。<br/>
+<br/>
+<a href="http://www.youtube.com/watch?feature=player_embedded&amp;v=m7RvF_mYORA">動画</a><br/>
+<br/>
+ご覧の通り、エディタの表示が追いつかないほどの変態高速入力となっております。<br/>
+<br/>
+<h2>用意したもの</h2><br/>
+<br/>
+<ul>
+<li>mbed(黄色いほう、青いのでもいける)</li>
+<li>秋月のUSB DIP化キット</li>
+<li>ソルダーレスブレッドボードと配線</li>
+</ul>
+<br/>
+プログラムはこちら。わずか50行弱! こんなに簡単にオリジナルUSBデバイスが作れるmbedってすばらしい!<br/>
+<br/>
+<figure id="code23-1"><pre><code class="c">
+#include &quot;mbed.h&quot;
+#include &quot;USBKeyboard.h&quot;
+
+// Large buffer may cause time rag when file loading.
+#define BUFFER_LENGTH (128)
+
+LocalFileSystem local(&quot;mbed&quot;);
+unsigned char controllerData[BUFFER_LENGTH];
+int controllerDataPosition = 0;
+FILE *fp;
+long fileLength = 0;
+long filePosition = 0;
+Ticker keyTicker;
+USBKeyboard keyboard;
+DigitalOut finishLed = LED1;
+
+bool trigger() {
+    keyboard.keyCode(controllerData[controllerDataPosition], controllerData[controllerDataPosition + 1]);
+
+    filePosition += 2;
+    if (filePosition &gt;= fileLength) {
+        return false;
+    }
+
+    controllerDataPosition += 2;
+    if (controllerDataPosition &gt;= BUFFER_LENGTH) {
+        fread(controllerData, 1, BUFFER_LENGTH, fp);
+        controllerDataPosition = 0;
+    }
+    return true;
+}
+
+int main() {
+    // TODO replace your filename
+    fp = fopen(&quot;/mbed/tas.txt&quot;, &quot;rb&quot;);
+    controllerDataPosition = 0;
+
+    fseek(fp, 0L, SEEK_END);
+    fileLength = ftell(fp);
+    fseek(fp, 0L, SEEK_SET);
+
+    fread(controllerData, 1, BUFFER_LENGTH, fp);
+    while (trigger());
+    fclose(fp);
+
+    finishLed = 1;
+}
+</code></pre></figure>
+<br/>
+プログラムでなにをしているかというと、キー入力データファイルを読み込んで、ひたすらキー入力しているだけです。全ての入力が終わったタイミングでLEDを点けています。<br/>
+<br/>
+配線はこんな感じです。<br/>
+<img src="images/2012-12-12+16.18.21.jpg" alt="画像1" /><br/>
+<br/>
+<h2>TASデータの仕様</h2><br/>
+<br/>
+<ul>
+<li>2バイト = 1入力データで、時系列順に並んでいる</li>
+<li>偶数バイト目は、キーコード(0?255)</li>
+<li>奇数バイト目は、補助キーの状態フラグ(1: ctrl, 2: shift, 4: alt)</li>
+</ul>
+<br/>
+テキストデータ→TASデータの変換ツールを作ってみましたので、汚いコードですが参考までにリンクしてきます。<br/>
+<br/>
+<h2>使い方</h2><br/>
+<br/>
+<ul>
+<li>事前にTASデータファイルを作成しておきます。</li>
+<li>mbedのサイトにログインしてコンパイラを開き、プログラムをコンパイルしてダウンロードします。</li>
+<li>mbedに付属しているUSBポートに接続するとマスストレージデバイスとして認識されるので、バイナリファイルとデータファイルを置きます。</li>
+<li>一旦mbed上のボタンを押し、リセットします。</li>
+<li>適当なエディタを開きます。エディタの入力支援機能は「全部オフ」にします。</li>
+<li>配線の写真右上のほうのUSBポートをPCに接続すると、キーボードとして認識され、キーが全力で入力されます。</li>
+</ul>
+<br/>
+<h2>性能</h2><br/>
+1097キーをタイプするのに5.80秒掛かっていたので、<b>1秒間で189キー</b>入力することができます。<br/>
+<br/>
+<h2>TAS-codingの今後</h2><br/>
+今回はエディタへの単純な入力のみでしたが、以下のような記録改善テクニックが出現するだろうと予想されます。<br/>
+<br/>
+<ul>
+<li>コンパイラ的に不要な入力を排除する。</li>
+<li>コピー&amp;ペーストを使う。</li>
+<li>IDEの補完機能を利用してキーストロークを減らす。</li>
+<li>自動入力マウスなど、他のTASデバイスを併用する。</li>
+<li>TAS-codingデータ記録専用エディタが作られる。</li>
+<li>などなど……</li>
+</ul>
+<br/>
+TAS-codingの世界はまだまだ始まったばかり。今後の変態的発展に期待したいところです。<br/>
+<br/>
+次は<a href="https://twitter.com/hakurai">hakuraiさん</a>ですー。<br/>
+<br/>
+
+</body>
+</html>
+

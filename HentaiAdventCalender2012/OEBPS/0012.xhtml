@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<title>day11</title>
+<link rel="stylesheet" href="css/default.css" type="text/css" />
+</head>
+<body>
+<h3>day11</h3>
+<h1>HENTAI元素</h1><br/>
+<br/>
+この記事はHENTAI Advent Calendar 2012 - 変態アドベントカレンダー 11日目の記事です。<br/>
+<img src="images/__________2012-11-03_23.31.02_original.png" alt="画像" /><br/>
+<a href="http://atnd.org/events/33835">HENTAI Advent Calendar 2012 - 変態アドベントカレンダー - : ATND</a><br/>
+<br/>
+昨日は <a href="https://twitter.com/mike_neck">@mike_neck</a>さんの素晴らしいエントリーでした(´；ω；｀)ﾌﾞﾜｯ。<br/>
+<br/>
+さて。今日はお手軽にHENTAI元素を確認する方法をお話します。<br/>
+<br/>
+まず、こんなん書きます。(参考: <a href="http://stackoverflow.com/questions/2246901/how-can-i-use-jquery-in-greasemonkey-scripts-in-google-chrome">How can I use jQuery in Greasemonkey scripts in Google Chrome? - Stack Overflow</a>)<br/>
+<br/>
+<figure id="code10-1"><pre><code class="javascript">
+// ==UserScript==
+// @match http://famo.us/*
+// ==/UserScript==
+
+function addJQuery(callback) {
+    var script = document.createElement(&quot;script&quot;);
+    script.setAttribute(&quot;src&quot;, &quot;//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js&quot;);
+    script.addEventListener(&apos;load&apos;, function() {
+        var script = document.createElement(&quot;script&quot;);
+        script.textContent = &quot;window.jQ=jQuery.noConflict(true);(&quot; + callback.toString() + &quot;)();&quot;;
+        document.body.appendChild(script);
+        }, false);
+    document.body.appendChild(script);
+}
+
+function main() {
+    jQ(&apos;.symbol&apos;).text(&apos;Ht&apos;);
+    jQ(&apos;.name&apos;).text(&apos;HENTAI Advent Calendar 2012&apos;);
+}
+
+addJQuery(main);
+</code></pre></figure>
+<br/>
+つぎに chrome://chrome/extensions/ を開いて。Chromeに上記のGreasemonkeyをドロップ。しゃきーん。<br/>
+<br/>
+最後に。以下のサイトを開きます。<br/>
+<a href="http://famo.us/">http://famo.us/</a><br/>
+<br/>
+すると、みなさんにとって居心地の良い空間が広がりました。(∩´∀｀)∩ﾜｰｲ<br/>
+<br/>
+    元素記号:Ht<br/>
+    名称:HENTAI Advent Calendar 2012<br/>
+<br/>
+<img src="images/20121211001600.png" alt="画像1" /><br/>
+<br/>
+球状でも確認できます！<br/>
+<img src="images/20121211001606.png" alt="画像2" /><br/>
+<br/>
+らせん状でも確認できます！<br/>
+<img src="images/20121211001609.png" alt="画像3" /><br/>
+<br/>
+筒状でも確認できます！<br/>
+<img src="images/20121211001613.png" alt="画像4" /><br/>
+<br/>
+周期表でも確認できます！<br/>
+<img src="images/20121211001619.png" alt="画像5" /><br/>
+<br/>
+これで化学の期末テストはバッチリだょ(*´∀｀)<br/>
+<br/>
+みんなも試してみてね！<br/>
+<br/>
+明日は<a href="https://twitter.com/ryosms">@ryosms</a> さんですー。たのしみだなー。<br/>
+<br/>
+
+</body>
+</html>
+

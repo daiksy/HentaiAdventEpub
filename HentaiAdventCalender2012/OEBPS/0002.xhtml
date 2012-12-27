@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<title>day01</title>
+<link rel="stylesheet" href="css/default.css" type="text/css" />
+</head>
+<body>
+<h3>day01</h3>
+2012年12月1日土曜日<br/>
+変態アドベントカレンダー2012【1日目】文字列の変態力を計ってみよう。<br/>
+いよいよはじまりました、<a href="http://atnd.org/events/33835">変態アドベントカレンダー 2012</a><br/>
+<br/>
+トップバッターの<a href="http://twitter.com/daiksy">@daiksy</a>です！！<br/>
+<br/>
+さて、初日ということでまずは小手調べ。<br/>
+<br/>
+みなさんはある文字列が変態かどうか、気になることってありませんか？<br/>
+<br/>
+Scalaなら、すごく簡単に調べることができます。<br/>
+<br/>
+Scalaには、「暗黙の型変換」という機能があって、これを用いることで、既存の型を拡張することができます。とりあえずやってみましょう。<br/>
+<br/>
+<br/>
+<figure id="code1-1"><pre><code class="scala">
+trait hentaiConverter {
+    implicit def stringToHentaiChecker(s: String) = HentaiChecker(s)
+    case class HentaiChecker(s: String) {
+        def isHentai: Boolean = s == &quot;変態&quot;
+    }
+}
+</code></pre></figure>
+<br/>
+このhentaiConverterをextendしたクラス内で、文字列に対してisHentaiメソッドが使えるようになります。<br/>
+例えば、&quot;変態&quot;.isHentai はtrueを返します。<br/>
+<br/>
+もう少し拡張してみます。<br/>
+せっかくだから、文字列の変態力を調べられるようにしましょう。<br/>
+<br/>
+Googleの検索で、「変態」に続いて文字列を指定した場合の結果件数を、変態力とみなしましょう。実装はこうです。<br/>
+<br/>
+<figure id="code1-2"><pre><code class="scala">
+trait hentaiConverter {
+    implicit def stringToHentaiChecker(s: String) = HentaiChecker(s)
+    case class HentaiChecker(s: String) {
+        def hentaiPower: Int = {
+            import scala.io.Source
+            val contents = Source.fromURL(&quot;http://www.google.co.jp/search?q=変態+%s&quot;.format(s), &quot;utf8&quot;).getLines.mkString
+            val searchCountPattern = &quot;約? ?([0-9,]+) ?件&quot;.r
+            val numberPattern = &quot;[0-9]+&quot;.r
+            val searchedCount = numberPattern.findFirstIn(searchCountPattern.findFirstIn(contents).getOrElse(&quot;0&quot;).replace(&quot;,&quot;, &quot;&quot;)).getOrElse(&quot;0&quot;).toInt
+            searchedCount
+        }
+    }
+}
+</code></pre></figure>
+<br/>
+これで、hentaiConverterをextendしたクラス内でhentaiPowerメソッドを呼ぶことで、変態力を取ることができます。<br/>
+ちなみに&quot;だいくしー&quot;.hentaiPowerによる変態力は、10,700,000でした。<br/>
+<br/>
+上記のコードですが、実は動きません。<br/>
+Googleの検索は、ユーザエージェントが未指定だと403を返すからです。<br/>
+<br/>
+実際にGoogleに対してスクレイピングを仕掛けると、たぶん規約に反すると思うので、それっぽいけど動かないコードにしてます。<br/>
+<br/>
+<S><a href="http://dispatch.databinder.net/Dispatch.html">Dispatch</a>を使えば(ry)</S>   絶対に動かしてはいけませんよ！<br/>
+<br/>
+まぁ、動かないコードさらしてドヤ顔するあたりが、だいくしークオリティですな！！<br/>
+<br/>
+さて、明日は<a href="http://twitter.com/dproject21">@dproject21</a>さんですね！<br/>
+よろしくお願いします！ <br/>
+<br/>
+
+</body>
+</html>
+

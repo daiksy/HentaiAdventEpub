@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<title>day14</title>
+<link rel="stylesheet" href="css/default.css" type="text/css" />
+</head>
+<body>
+<h3>day14</h3>
+<h1>2012-12-14 「変態だ　通報しろ」を只管表示！Add Star</h1><br/>
+<br/>
+今年もやってまいりましたね<br/>
+この時期が…<br/>
+<br/>
+<h2>そう、変態アドベントカレンダー！</h2><br/>
+<br/>
+去年この企画に参加する為に、ブログを作成し、<br/>
+変態アドベントカレンダ in summerまで放置！<br/>
+そして今日まで放置！！！！<br/>
+もはや変態アドベントカレンダー用のブログに…(ﾟДﾟ)<br/>
+<br/>
+さて、<br/>
+最近はHTML5で面白いゲームやUIが出てきました。<br/>
+私も面白いものを作りたいのでCanvasの勉強をしていきます(｀・ω・´)<br/>
+<br/>
+ということで、<br/>
+クリックすると「変態だ　通報しろ」を只管表示するスクリプトを作ってみました。<br/>
+<br/>
+<img src="images/20121214012001.png" alt="画像1" /><br/>
+<a href="http://dps.mods.jp/hentai_canvas/">サンプルはこちら</a><br/>
+<br/>
+HTML<br/>
+<figure id="code14-1"><pre><code class="html">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot;&gt;
+    &lt;style type=&quot;text/css&quot;&gt;
+        div {
+            border: 1px solid;
+            margin: 100px auto;
+            width: 600px;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div&gt;
+    &lt;canvas id=&quot;hentai&quot; width=&quot;600&quot; height=&quot;300&quot;&gt;&lt;/canvas&gt;
+&lt;/div&gt;
+
+&lt;script type=&quot;text/javascript&quot; src=&quot;canvas.js&quot;&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre></figure>
+<br/>
+JavaScript<br/>
+<figure id="code14-1"><pre><code class="html">
+// canvasの設定
+var canvas = document.getElementById(&apos;hentai&apos;);
+var context = canvas.getContext(&apos;2d&apos;);
+
+// 表示位置
+var n = 0;
+
+// テキストの指定
+var text_array = [&quot;変態だ！&quot;,&quot;通報せよ&quot;];
+context.fillStyle = &apos;rgba(255,0,0,0.25)&apos;;
+canvas.addEventListener(&apos;click&apos;, onClick, false);
+
+
+function onClick (e) {
+
+    var x = y = 0;
+
+    // クリックの位置
+    x = e.clientX - canvas.offsetLeft;
+    y = e.clientY - canvas.offsetTop;
+
+    // 文字サイズを指定の範囲でランダムに抽出
+    var randnum = 10 + Math.floor( Math.random() * 51 );
+
+    context.beginPath();
+
+    // 表示テキストの指定
+    context.font = randnum + &quot;pt Arial&quot;;
+    context.fillText(text_array[n], x, y);
+
+    n++;
+    if (n &gt; text_array.length - 1) n = 0;
+
+    context.closePath();
+    context.fill();
+};
+</code></pre></figure>
+<br/>
+処理は「変態だ！」「通報せよ」のテキストを、マウスクリックの位置にランダムの文字サイズで<br/>
+交互に表示するといった内容です。<br/>
+処理の書き方に無理矢理感があるのでもっと良い書き方があれば教えていただきたいです。<br/>
+<br/>
+次回のアドベントカレンダーで変態を追撃するゲームを発表できるよう<br/>
+これからも頑張りますっ。<br/>
+<br/>
+それではみなさん、よいHENTAIライフを！<br/>
+明日は、@jyukutyoの番です☆<br/>
+
+</body>
+</html>
+

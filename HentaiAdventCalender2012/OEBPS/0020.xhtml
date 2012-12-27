@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<title>day19</title>
+<link rel="stylesheet" href="css/default.css" type="text/css" />
+</head>
+<body>
+<h3>day19</h3>
+<h1>Recommendifyで気軽にレコメンドエンジンに触れてみるAdd Star</h1><br/>
+<br/>
+<a href="http://atnd.org/events/33835">変態アドベントカレンダー</a>の19日目です。<br/>
+<br/>
+今日はRecommendifyで気軽にレコメンドエンジンに触れてみたいと思います。<br/>
+<br/>
+※コサイン類似度などの小難しい話は一切登場しません。<br/>
+<br/>
+<ul>
+<li>レコメンドエンジンとは</li>
+<li>Recommendifyで出来ること</li>
+<li>Redisのインストールと起動</li>
+<li>Recommendifyのインストール</li>
+<li>トラッキングデータの登録</li>
+<li>レコメンドデータの取得</li>
+</ul>
+<br/>
+<br/>
+<h2>1. レコメンドエンジンとは</h2><br/>
+<br/>
+Amazonで「この商品を買った人はこんな商品も買っています」とユーザに商品をおすすめしてくるシステムのことです。何かを見た／クリックした／買ったといった情報を使用して、他のサイトやユーザーに対して商品のおすすめを行います。<br/>
+<br/>
+<h2>2. Recommendifyで出来ること</h2><br/>
+<br/>
+RecommendifyとはRubyとRedisベースのレコメンドエンジンです。<br/>
+<br/>
+アイテム間の類似性を計算することでレコメンデーションを行えます、<br/>
+<br/>
+<h2>3. Redisのインストールと起動</h2><br/>
+<br/>
+既にRedisが入っている人も多いかと思いますが(笑)、まだの人はインストールしましょう。<br/>
+<br/>
+macな人はhomebrewでインストールしてもいいし、そうでない人はソースから入れましょう。<br/>
+<br/>
+for mac<br/>
+<br/>
+<figure id="code19-1"><pre><code class="shell">
+$ brew install redis
+</code></pre></figure>
+<br/>
+for otherwize<br/>
+<br/>
+<figure id="code19-2"><pre><code class="shell">
+$ wget http://download.redis.io/redis-stable.tar.gz
+$ tar xvzf redis-stable.tar.gz
+$ cd redis-stable
+$ make &amp;&amp; make install
+</code></pre></figure>
+<br/>
+起動させます。<br/>
+<br/>
+<figure id="code19-3"><pre><code class="shell">
+$ redis-server
+</code></pre></figure>
+<br/>
+※停止するときは 別ターミナルから<b> redis-cli shutdown </b>します<br/>
+<br/>
+一応テストとしてピンポンしておきましょう。<br/>
+<br/>
+<figure id="code19-4"><pre><code class="shell">
+$ redis-cli ping
+pong
+</code></pre></figure>
+<br/>
+<br/>
+試しにデータを出し入れしてみます。<br/>
+<br/>
+<figure id="code19-5"><pre><code class="shell">
+$ redis-cli set mykey hoge
+OK
+
+$ redis-cli get mykey
+&quot;hoge&quot;
+</code></pre></figure>
+<br/>
+<br/>
+<h2>4. Recommendifyのインストール</h2><br/>
+<br/>
+gemでインストールします。<br/>
+<br/>
+<figure id="code19-6"><pre><code class="shell">
+$  gem install recommendify
+</code></pre></figure>
+<br/>
+※うまく入らない場合は<b>gem update</b>してみるとうまくいくかもしれません。<br/>
+<br/>
+<h2>5. トラッキングデータの登録</h2><br/>
+<br/>
+ユーザがそれぞれ複数のアイテムを購入をしたとした場合のサンプルコードです。<br/>
+<br/>
+<figure id="code19-7"><pre><code class="ruby">
+# -*- encoding: utf-8 -*-
+require &apos;recommendify&apos;
+require &apos;redis&apos;
+
+Recommendify.redis = Redis.new
+
+class Recommender &lt; Recommendify::Base
+  max_neighbors 10
+  input_matrix :order_items,
+    :similarity_func =&gt; :jaccard,
+    :weight =&gt; 5.0
+end
+
+recommender = Recommender.new
+recommender.order_items.add_set(&quot;daiksyさん&quot;, [&quot;ふつうの変態プログラミング&quot;, &quot;変態が知るべき97のこと&quot;, &quot;変態サムライ&quot;])
+recommender.order_items.add_set(&quot;irofさん&quot;, [&quot;ふつうの変態プログラミング&quot;, &quot;変態サムライ&quot;])
+recommender.order_items.add_set(&quot;kuchitamaさん&quot;, [&quot;変態が知るべき97のこと&quot;, &quot;やさしい変態入門&quot;])
+recommender.process!
+</code></pre></figure>
+<br/>
+<h2>6. レコメンドデータの取得</h2><br/>
+<br/>
+「変態が知るべき97のこと」というアイテムと他のアイテムの類似度を調べてみます。<br/>
+<br/>
+<figure id="code19-8"><pre><code class="ruby">
+recommender.for(&quot;変態が知るべき97のこと&quot;).each do |recommended_product|
+  puts &quot;#{recommended_product.item_id} 類似度:#{recommended_product.similarity}\n&quot;
+end
+</code></pre></figure>
+<br/>
+結果<br/>
+<br/>
+<figure id="code19-9"><pre><code class="samp">
+やさしい変態入門 類似度:2.5変態サムライ 類似度:1.6666
+ふつうの変態プログラミング 類似度:1.6666
+</code></pre></figure>
+<br/>
+ということで、「変態が知るべき97のこと」に類似している本は「やさしい変態入門 」だということが分かりました。<br/>
+<br/>
+簡単に利用できますね！<br/>
+<br/>
+<h2>利用シーンについて</h2><br/>
+<br/>
+RecommendifyはRubyで書かれているため、既存の非Rubyプロダクトに組み込めないなーと思うかもしれません。<br/>
+<br/>
+1日1回実施されるようなバッチアプリケーションとして、行動履歴データからレコメンドデータを生成するようなものを作るのもありだと思います。<br/>
+<br/>
+使ったことはありませんが、本格的なレコメンドを行うには <a href="http://mahout.apache.org/">Apache Mahout</a> を使うのがよさそうです。<br/>
+<br/>
+明日は@Posauneさんです！お楽しみに。<br/>
+<br/>
+
+</body>
+</html>
+

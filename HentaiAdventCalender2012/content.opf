@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<package version="2.0" xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookId">
+<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+<dc:title>HENTAIAdventCalendar2012</dc:title>
+<dc:creator opf:role="aut">HENTAIAdventCalendar2012's author</dc:creator>
+<dc:language>ja</dc:language>
+<dc:publisher>HENTAIAdventCalendar2012's publisher</dc:publisher>
+<dc:identifier id="BookId">urn:uuid:mkepub.kujirahad.com_HENTAIAdventCalendar2012</dc:identifier>
+<meta name="cover" content="cover-image"/>
+</metadata>
+<manifest>
+  <!-- header info -->
+  <item id="ncx" href="content.ncx" media-type="application/x-dtbncx+xml" />
+  <item id="cover" href="OEBPS/cover.xhtml" media-type="application/xhtml+xml" />
+  <item id="cover-image" href="OEBPS/images/cover.jpg" media-type="image/jpeg" />
+  <!-- chapter -->
+<item id="chapter0001" href="OEBPS/0001.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0002" href="OEBPS/0002.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0003" href="OEBPS/0003.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0004" href="OEBPS/0004.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0005" href="OEBPS/0005.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0006" href="OEBPS/0006.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0007" href="OEBPS/0007.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0008" href="OEBPS/0008.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0009" href="OEBPS/0009.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0010" href="OEBPS/0010.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0011" href="OEBPS/0011.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0012" href="OEBPS/0012.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0013" href="OEBPS/0013.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0014" href="OEBPS/0014.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0015" href="OEBPS/0015.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0016" href="OEBPS/0016.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0017" href="OEBPS/0017.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0018" href="OEBPS/0018.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0019" href="OEBPS/0019.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0020" href="OEBPS/0020.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0021" href="OEBPS/0021.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0022" href="OEBPS/0022.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0023" href="OEBPS/0023.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0024" href="OEBPS/0024.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0025" href="OEBPS/0025.xhtml" media-type="application/xhtml+xml" />
+<item id="chapter0026" href="OEBPS/0026.xhtml" media-type="application/xhtml+xml" />
+
+</manifest>
+<spine toc="ncx">
+  <itemref idref="cover" linear="no" />
+<!--
+  <itemref idref="chapter0001" />
+-->
+<itemref idref="chapter0001" />
+<itemref idref="chapter0002" />
+<itemref idref="chapter0003" />
+<itemref idref="chapter0004" />
+<itemref idref="chapter0005" />
+<itemref idref="chapter0006" />
+<itemref idref="chapter0007" />
+<itemref idref="chapter0008" />
+<itemref idref="chapter0009" />
+<itemref idref="chapter0010" />
+<itemref idref="chapter0011" />
+<itemref idref="chapter0012" />
+<itemref idref="chapter0013" />
+<itemref idref="chapter0014" />
+<itemref idref="chapter0015" />
+<itemref idref="chapter0016" />
+<itemref idref="chapter0017" />
+<itemref idref="chapter0018" />
+<itemref idref="chapter0019" />
+<itemref idref="chapter0020" />
+<itemref idref="chapter0021" />
+<itemref idref="chapter0022" />
+<itemref idref="chapter0023" />
+<itemref idref="chapter0024" />
+<itemref idref="chapter0025" />
+<itemref idref="chapter0026" />
+
+</spine>
+<guide><reference type="cover" href="OEBPS/cover.xhtml" title="Cover"/></guide>
+</package>
+

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<title>day08</title>
+<link rel="stylesheet" href="css/default.css" type="text/css" />
+</head>
+<body>
+<h3>day08</h3>
+<h1>みんなが大好きないろふさんをSVGでざっくり書いてみた</h1><br/>
+<br/>
+この記事はHENTAI Advent Calendar 2012 - 変態アドベントカレンダー 8日目の記事です。<br/>
+<br/>
+<a href="http://atnd.org/events/33835">HENTAI Advent Calendar 2012 - 変態アドベントカレンダー</a><br/>
+<br/>
+もうすっかりネタ切れ気味で変態濃度は薄くなってきましたが、<br/>
+<br/>
+今回は最近巷で流行している<b>「いろふさんアイコン」</b>をCacooでざっくり書いてHTMLからSVGで表示するようにしてみました。<br/>
+<br/>
+<br/>
+書いた図はこんな感じです。<br/>
+<br/>
+<img src="images/20121208184910.png" alt="画像1" /><br/>
+<br/>
+<a href="https://cacoo.com/diagrams/KEBT4JjUWVvQTbzP">https://cacoo.com/diagrams/KEBT4JjUWVvQTbzP</a><br/>
+<br/>
+うん。かなりざっくりですね。<br/>
+<br/>
+というわけで、次にこのCacooで書いた図をHTMLで動的に表示しましょう。<br/>
+<br/>
+Webフレームワークは「Play Framework 2.0.4」 を使います。<br/>
+<br/>
+あとHTMLで表示するので「Raphael」というSVGを扱えるJSライブラリを使用します。<br/>
+<br/>
+Play Framework : <a href="http://www.playframework.org/">Home ー Playframework</a><br/>
+<br/>
+Raphael: <a href="http://raphaeljs.com/">RaphaelーJavaScript Library</a><br/>
+<br/>
+さっきの図はCacooの<b>「図の内容取得」</b>APIで座標データなどが取得できます。<br/>
+<br/>
+<a href="https://cacoo.com/lang/ja/api_diagram_contents">https://cacoo.com/lang/ja/api_diagram_contents</a><br/>
+<br/>
+少し話が逸れますが、ベジェ曲線についてはこの記事がとても分かり易いです。<br/>
+<br/>
+この分野に興味がある人は、一度目を通しておくことをお勧めします。<br/>
+<br/>
+<a href="http://ruiueyama.tumblr.com/post/11197882224">中学生でもわかるベジェ曲線</a><br/>
+<br/>
+さっきの図をAPI経由でデータを取得するURLはこんなURLになります。<br/>
+<br/>
+<a href="https://cacoo.com/api/v1/diagrams/KEBT4JjUWVvQTbzP/contents.xml?returnValues=position,point">https://cacoo.com/api/v1/diagrams/KEBT4JjUWVvQTbzP/contents.xml?returnValues=position,point</a><br/>
+<br/>
+path close=&quot;true&quot; はその図形の線が閉じているかどうか。<br/>
+<br/>
+NORMALとBEZIER_CPはそれぞれ「アンカーポイント」とカーブの曲がりを調整する「コントロールポイント」だと思います。多分。<br/>
+<br/>
+<br/>
+ここまできたらあとは簡単です。<br/>
+<br/>
+手順としては、<br/>
+<br/>
+1. Cacoo APIを使用して図の内容をXMLで取得する。<br/>
+<br/>
+2. Controller(Scala)でXMLをパースしてViewで表示しやすいクラス構造でデータを持たせる。（今回はPolygonクラスを定義）<br/>
+<br/>
+3. ViewからControllerから渡されたデータをRaphaelを使用してSVGで表示する。<br/>
+<br/>
+のような感じ。<br/>
+<br/>
+<br/>
+<br/>
+ということでこれらのフレームワークやライブラリを使ってHTMLで表示すると<br/>
+<br/>
+いろふさんはこんな感じで表示されました。<br/>
+<br/>
+<img src="images/20121208190243.png" alt="画像2" /><br/>
+<br/>
+<br/>
+・・・なんか微妙にずれてる気がしないでもないですが、、、、<br/>
+・・・・・あとプログラムがバグってるのでパスが閉じてない図はエラーになります、、、<br/>
+<br/>
+というわけでソースコードをgistにアップしておきます。<br/>
+<br/>
+※ソースコードがめちゃくちゃ汚いので誰か綺麗に書き直してほしい・・<br/>
+<br/>
+※ScalaでXMLのパースはすごく簡単ですね！<br/>
+<br/>
+<a href="https://gist.github.com/4239683">変態アドベントカレンダー2012 8日目 ー Gist</a><br/>
+<br/>
+明日は @soudai1025 さんです。<br/>
+<br/>
+よろしくおねがいします。<br/>
+<br/>
+
+</body>
+</html>
+

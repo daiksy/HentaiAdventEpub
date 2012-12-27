@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<title>day06</title>
+<link rel="stylesheet" href="css/default.css" type="text/css" />
+</head>
+<body>
+<h3>day06</h3>
+<h1>Clojure から POI ってみる</h1><br/>
+<br/>
+この記事は、変態アドベントカレンダー 6日目の記事です。前日は <a href="http://haganemetal.net/2012/12/05/300.html">はがねのつるぎさん</a> でした。<br/>
+<br/>
+このアドベントカレンダーは、意識もスキルも高い変態勇者がハイテクを駆使してかくもの、と思ってらっしゃる方にはちょっと申し訳ありません。若干変態度もハイテク度も低めで肩透かしを食らうことになりますが、しばしお付き合いください。<br/>
+<br/>
+今日のネタは、私自身の日々の切実な課題である、Excel文書と戦うための準備、といったところです。<br/>
+<br/>
+<h2>Excel ドキュメントにに対する不満</h2><br/>
+<br/>
+はじめに言っておきますが、私は「 <b>Excel</b> を dis るつもりはない」のです。<br/>
+<br/>
+<b>人を憎んでExcel憎まず</b> です。 <b>Excel</b> 自体は軽快で素直でとても良いツールだとおもいます。現に、Excelライクなソフトはいくつかあれど、本家Excel程の使い勝手を実現できているところまでは来ていないと思っています。ただ、その 使い方 に問題が多いのです。<br/>
+<br/>
+私の周りでは仕様書はもっぱら Excel 方眼紙に書くもの、となっています。 Word の使い勝手がいまいちなのと、やれ Markdown だ ReSTructured Text だの言ってみたところで、「じゃあ明日からコレで書け」といっても、書く人がついてこれなくて困ってしまいます。「だからExcel」という状態がすでに15年以上はたっているような気がします。<br/>
+<br/>
+でも、*Subversion* (gitじゃないよ。ヤレヤレだぜorz)で管理された <b>Excel</b> 文書のバイナリが増えるにつれ、<br/>
+<br/>
+    ・印刷がプリンタによってずれちまう、チョーめんどくせぇ<br/>
+    ・ファイル/ディレクトリ横断的にサクッと検索できねぇ<br/>
+    ・差分が取れね?(セルのテキストに限ってはら出来るのですが図形とか色とか...)<br/>
+    ・Emacs のバッファで見れねぇwww<br/>
+<br/>
+といった、「オレ的ストレス」は増える一方。なんとかしないとまた倒れてしまいます(実は今年１月?９月まで休職してました)。<br/>
+<br/>
+<h2>愚痴を言っても始まらない</h2><br/>
+<br/>
+まわりの人たちを変える、とかすでに作成されてしまった文書を全て書き直す、とか、非現実的なことは考えるだけ無駄です。ここはひとつ、自分にできるストレス対策として、 <b>Excel文書と向き合う</b> 方向で考えます。<br/>
+<br/>
+前置きが長くなってしまいましたが、とりあえずは Excel 文書を扱うプログラムを <b>さくっと</b> つくれるような下地作りをしておきたいと思っています。<br/>
+<br/>
+自分は以前に Ruby で Win32 OLE 経由で Excel 文書をどーにかこーにかしたことはあったのですが、数年前仕事用に Mac を Get したので Mac で扱えることが前提です。で OLE はパス。POI は使ったことがないのですが、POI なら Clojure から簡単に使えそうです。<br/>
+<br/>
+<h2>Getting Started</h2><br/>
+<br/>
+Clojure から POI を使うには、leiningen でプロジェクトを作って、:dependencies に<br/>
+<br/>
+<figure id="code6-1"><pre><code class="clojure">
+[org.apache.poi/poi &quot;3.8&quot;]
+[org.apache.poi/poi-ooxml &quot;3.8&quot;]
+</code></pre></figure>
+<br/>
+とか追加すればよいです。<br/>
+<br/>
+POI の Java のサンプルは ここらへん にあります。Clojure は「書きやすいJava」と <b>言えなくもない</b> ので、最悪「直訳」的に書いてしまえます。サンプルにあるコードの <a href="http://poi.apache.org/spreadsheet/quick-guide.html#CreateCells">Creating Cells</a> というのを「直訳」してみます。<br/>
+<br/>
+<figure id="code6-2"><pre><code class="clojure">
+(defn add-two-sheets-and-save
+  &quot;シートとセルを追加する。&quot;
+  ([] (add-two-sheets-and-save &quot;workbook-01.xls&quot;))
+  ([fname]
+     (with-open [out (FileOutputStream. fname)]
+       (let [wb (HSSFWorkbook.)
+             helper (.getCreationHelper wb)
+             sheet (.createSheet wb &quot;new-sheet&quot;)]
+         (let [row (.createRow sheet 0)]
+           (-&gt; row (.createCell 0) (.setCellValue 1.0)) ;; 1 だとコンパイルエラー
+           (-&gt; row (.createCell 1) (.setCellValue 1.2))
+           (-&gt; row (.createCell 2) (.setCellValue (.createRichTextString helper &quot;This is a string.&quot;)))
+           (-&gt; row (.createCell 3) (.setCellValue true)))
+         (.write wb out)))))
+</code></pre></figure>
+<br/>
+はい、全然イケてないですねwww。でもいいんです。今はサクッと書けることに重きをおきます。<br/>
+<br/>
+実際のところ、一から book を作るというケースはあまり無いです。どちらかというと、読む方が多いでしょう。なので読む方のサンプルを作りましょう。<br/>
+<br/>
+元ネタを何にしようか迷ったのですが、以前ちょっと流行った <b>クリエイターかるた</b> というやつにしました。ここ で公開されています。GoogleDrive 上のドキュメントですので、メニューから [ファイル] - [形式を指定してダウンロード] で手元にダウンロードして (.xlsx か .ods 形式) 、さらに <b>Excel2003</b> 形式 に LibreOffice とかで変換しておきます。(これまたオレオレ事情で、会社では 2003形式が標準なんですよ)。<br/>
+<br/>
+せっかくなので REPL 上でインタラクティブに作ってみましょう。hentai_poi/core.clj には、まずは<br/>
+<br/>
+<figure id="code6-3"><pre><code class="clojure">
+(ns hentai-poi.core
+  (:import
+   (java.io FileOutputStream FileInputStream)
+   (java.util Date Calendar)
+   (org.apache.poi.hssf.usermodel HSSFWorkbook)
+   (org.apache.poi.ss.usermodel Workbook Sheet Cell Row WorkbookFactory DateUtil
+                                IndexedColors CellStyle Font CellValue)
+   (org.apache.poi.ss.util CellReference AreaReference CellRangeAddress RegionUtil)))
+</code></pre></figure>
+<br/>
+とだけ書いておき、lein repl で REPL を起動、require しておきます。<br/>
+<br/>
+<figure id="code6-4"><pre><code class="clojure">
+; nREPL 0.1.6-preview
+user&gt; (require &apos;hentai-poi.core)
+nil
+user&gt; (ns hentai-poi.core)
+nil
+hentai-poi.core&gt; 
+</code></pre></figure>
+<br/>
+ファイルを読むので FileInputSream を作っておきます。<br/>
+<br/>
+<figure id="code6-5"><pre><code class="clojure">
+hentai-poi.core&gt; (def infile &quot;クリエイターかるた.xls&quot;)
+#&apos;hentai-poi.core/infile
+hentai-poi.core&gt; (def input (FileInputStream. infile))
+#&apos;hentai-poi.core/input
+hentai-poi.core&gt; 
+</code></pre></figure>
+<br/>
+ワークブックを作ります。<br/>
+<br/>
+<figure id="code6-6"><pre><code class="clojure">
+hentai-poi.core&gt; (def wb (WorkbookFactory/create input))
+#&apos;hentai-poi.core/wb
+hentai-poi.core&gt; (class wb)
+org.apache.poi.hssf.usermodel.HSSFWorkbook
+hentai-poi.core&gt; 
+</code></pre></figure>
+<br/>
+ちゃんと作れているようですね。セルを読むには、シート -&gt; 行 -&gt; セル という３階層に手繰っていく必要があります。順番に試してみましょう。シートは手を抜いて１シート目にしてみます。<br/>
+<br/>
+<figure id="code6-7"><pre><code class="clojure">
+hentai-poi.core&gt; (def sheet (.getSheetAt wb 0))
+#&apos;hentai-poi.core/sheet
+hentai-poi.core&gt; (class sheet)
+org.apache.poi.hssf.usermodel.HSSFSheet
+hentai-poi.core&gt; (bean sheet)
+{:drawingPatriarch #&lt;HSSFPatriarch org.apache.poi.hssf.usermodel.HSSFPatriarch@37734b10&gt;, :displayZeros true, :autobreaks false, :displayFormulas false, :forceFormulaRecalculation false, :objectProtect false, :workbook #&lt;HSSFWorkbook org.apache.poi.hssf.usermodel.HSSFWorkbook@724523e0&gt;, :displayRowColHeadings true, :rightToLeft false, :leftCol 0, :class org.apache.poi.hssf.usermodel.HSSFSheet, :topRow 0, :gridsPrinted false, :alternateFormula true, :header #&lt;HSSFHeader org.apache.poi.hssf.usermodel.HSSFHeader@e82751a&gt;, :defaultRowHeight 330, :sheetName &quot;本当クリエイティブ職は地獄だぜフゥーハハハーハァー！&quot;, :defaultColumnWidth 15, :horizontallyCenter false, :alternateExpression true, :sheetConditionalFormatting #&lt;HSSFSheetConditionalFormatting org.apache.poi.hssf.usermodel.HSSFSheetConditionalFormatting@9e0a562&gt;, :displayGridlines true, :lastRowNum 57, :defaultRowHeightInPoints 16.5, :firstRowNum 0, :active true, :dataValidationHelper #&lt;HSSFDataValidationHelper org.apache.poi.hssf.usermodel.HSSFDataValidationHelper@1bf5d5bc&gt;, :rowSumsRight false, :printSetup #&lt;HSSFPrintSetup org.apache.poi.hssf.usermodel.HSSFPrintSetup@3d80fbe2&gt;, :scenarioProtect false, :verticallyCenter false, :printGridlines false, :drawingEscherAggregate #&lt;EscherAggregate [ESCHERAGGREGATE]null[/ESCHERAGGREGATE]null&gt;, :numMergedRegions 1, :columnBreaks #&lt;int[] [I@1006bed5&gt;, :rowBreaks #&lt;int[] [I@1006bed5&gt;, :rowSumsBelow false, :displayGuts false, :protect false, :dialog false, :selected true, :footer #&lt;HSSFFooter org.apache.poi.hssf.usermodel.HSSFFooter@744decf5&gt;, :fitToPage true, :password 0, :physicalNumberOfRows 58, :paneInformation #&lt;PaneInformation org.apache.poi.hssf.util.PaneInformation@1925fa1a&gt;}
+hentai-poi.core&gt; 
+</code></pre></figure>
+<br/>
+bean 関数は、JavaBean を Clojure の HashMap に変換してくれる頼もしい味方です。REPL からオブジェクトの様子を時々覗くのに便利ですね。シートの次は行ですが、行は sheet.rowIterator() で取得できるのですが、Clojure 的には Java のイテレーターはあまり嬉しくないので iterator-seq でシーケンスに変換しちゃいます。<br/>
+<br/>
+<figure id="code6-8"><pre><code class="clojure">
+hentai-poi.core&gt; (def rows (iterator-seq (.rowIterator sheet)))
+#&apos;hentai-poi.core/rows
+hentai-poi.core&gt; (count rows)
+58
+hentai-poi.core&gt; 
+</code></pre></figure>
+<br/>
+count してみたら 58 と出ました。なんか知らんけど、「イケそうな気がする?」(最近見ないなぁ、天津木村)。続いてセルも、と行きたいところですが、セルは１つの行に対して .cellIterator() と呼んでやる必要があるので、まずは最初の行で挙動を見ておきましょう。<br/>
+<br/>
+<figure id="code6-9"><pre><code class="clojure">
+hentai-poi.core&gt; (def row (first rows))
+#&apos;hentai-poi.core/row
+hentai-poi.core&gt; (bean row)
+{:heightInPoints 25.0, :class org.apache.poi.hssf.usermodel.HSSFRow, :sheet #&lt;HSSFSheet org.apache.poi.hssf.usermodel.HSSFSheet@3e67f6a8&gt;, :formatted false, :zeroHeight false, :rowNum 0, :rowStyle nil, :lastCellNum 8, :firstCellNum 0, :height 500, :physicalNumberOfCells 8}
+hentai-poi.core&gt; 
+</code></pre></figure>
+<br/>
+最初の行を row に取得できたので、.cellIterator と iterator-seq でシーケンスを取得します。<br/>
+<br/>
+<figure id="code6-10"><pre><code class="clojure">
+hentai-poi.core&gt; (def cells (iterator-seq (.cellIterator row)))
+#&apos;hentai-poi.core/cells
+hentai-poi.core&gt; (count cells)
+8
+hentai-poi.core&gt; 
+</code></pre></figure>
+<br/>
+最初の行には 8 個、セルがあるようです。最初のセルは何かな？<br/>
+<br/>
+<figure id="code6-11"><pre><code class="clojure">
+hentai-poi.core&gt; (bean (first cells))
+IllegalStateException Only formula cells have cached results  org.apache.poi.hssf.usermodel.HSSFCell.getCachedFormulaResultType (HSSFCell.java:1184)
+hentai-poi.core&gt; 
+</code></pre></figure>
+<br/>
+うわぁ。ま、大勢に影響しないのであまり気にしないことにします。ここまでの情報で、シート内のセルを取得できることがわかりました。あとは、今まで使った関数を適当に組み合わせて適当にコードを書きます(説明雑やな)。<br/>
+<br/>
+ソース一式は <a href="https://github.com/ponkore/hentai-poi">GitHub</a> にあげてあります。<br/>
+<br/>
+出来上がったソースの解説は端折りましたが、REPL を使ったインタラクティブに開発するイメージが伝わりましたでしょうか。POI のような巨大なライブラリを相手にする場合でもなんとか戦える気がしてきました。Excel方眼紙は <b>巨大な敵</b> ですが、これで業務時間中に堂々と Clojure で...S式ラブ?<br/>
+<br/>
+変態度も難易度も低い目の記事になってしまいましたが、このへんにしておきます。明日はもじゃ変さんの記事です。よろしくお願いします。<br/>
+<br/>
+
+</body>
+</html>
+

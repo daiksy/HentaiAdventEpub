@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<title>day20</title>
+<link rel="stylesheet" href="css/default.css" type="text/css" />
+</head>
+<body>
+<h3>day20</h3>
+<h1>JavaをC#に変態させる。 #hentai_advent</h1><br/>
+<br/>
+この記事は<a href="http://atnd.org/events/33835">変態アドベントカレンダー</a>20日目の記事です。<br/>
+<br/>
+昨日はinatonさんの <a href="http://d.hatena.ne.jp/motefu/20121219">d:id:motefu:20121219</a> でした。・・・普通に役に立つんですが。今回の僕の記事どうしましょう。<br/>
+<br/>
+変態アドベントカレンダー、楽しいですね。しかしながら、みなさん変態の意味を取り違えておいででは・・・？<br/>
+変態とは、メタモルフォーゼです。あるものの形が何かを通して変わることをさします。例えば、芋虫は蝶に変態しますし、オタマジャクシはカエルに変態しますし、daiksyさんは変態に変態するわけです。あれれ？<br/>
+<br/>
+そんなわけで、変態させます。Javaを、C#に。<br/>
+<br/>
+<h2>JavaをC#に変態させる方法あれこれ。</h2><br/>
+<br/>
+JavaをC#に変態させる方法としてパッと思い浮かぶのははるか昔のVisual StudioについてきたJ#ですね。しかしこれはもはや黒歴史に近いのでここでは触れないでおきましょう。*1*2<br/>
+<br/>
+Java Native Interfaceを使って使用する方法がCodeProjectに乗っています。<br/>
+<br/>
+<ul>
+<li><a href="http://www.codeproject.com/Articles/245622/Using-the-Java-Native-Interface-in-Csharp">    Using the Java Native Interface in C# - CodeProject</a></li>
+</ul>
+<br/>
+しかしこれは変態させると言うよりも、イヤダイヤダと言っているJavaコードを強引に組み伏せるC#、というな構図しか浮かんで来ません。*3<br/>
+なんとなく、強引・・・。<br/>
+<br/>
+やっぱここはC#側がぐっとJava派に寄り添って、優しい心で凍りついたJavaの心を溶かすような、そんなアプローチが求められるわけです。*4<br/>
+<br/>
+というわけで、IKVM.NETです。<br/>
+<br/>
+<h2>IKVM.NETとは</h2><br/>
+<br/>
+IKVM.NETとは、JVMを.NET VM上に構築したものです。<br/>
+<br/>
+<ul>
+<li><a href="http://sourceforge.net/apps/mediawiki/ikvm/index.php?title=Main_Page">SourceForge.net: ikvm</a></li>
+</ul>
+<br/>
+・・・さらっと言いましたが、要するにVM on VMなわけで、動作速度はお察しください、になってしまいますが、まさにこれ以上Javaに寄り添ったアプローチなんて考えられるでしょうか。<br/>
+<br/>
+いわば。<br/>
+<br/>
+<figure id="code20-1"><pre><code>
+    C#『君は何も変わらなくて良い。全て受け止めるから僕のもとにおいでよ。』
+    Java『///』
+</code></pre></figure>
+<br/>
+といった感じでしょうか。いいですね、いいですね！<br/>
+<br/>
+<h2>IKVM.NETでJavaアセンブリを変態させる</h2><br/>
+<br/>
+IKVMをダウンロードすると大きく分けて3種類のバイナリが入っています。<br/>
+<br/>
+<ul>
+<li>IKVM：.NET上でjarファイルなどを実行するコマンド。javaコマンドの代わりに使うイメージ。</li>
+<li>IKVMC：Javaのバイナリファイルを.NETから参照可能なDLLやEXEに変換する。</li>
+<li>IKVMSTUB：.NETのバイナリファイルをJava上から参照可能なアセンブリに変換する。</li>
+</ul>
+<br/>
+それでは、1つずつ見ていきましょう。<br/>
+<br/>
+<h2>IKVM</h2><br/>
+<br/>
+これがまぁ本体に近いですね。構造的には.NETで実装されたJVMだそうです。ですので、jarファイルを指定してそのまま実行できます。<br/>
+例えば<br/>
+<br/>
+<figure id="code20-2"><pre><code class="java">
+public class JavaTest {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        System.out.println(&quot;Hello World!&quot;);
+    }
+}
+</code></pre></figure>
+<br/>
+こんなJavaファイルをコンパイルして作ったjavatest.jarを持って行って、Windwosだとこうします。<br/>
+<br/>
+<figure id="code20-3"><pre><code class="samp">
+&gt;ikvm -jar JavaTest.jar
+Hello World!
+</code></pre></figure>
+<br/>
+変態できましたね！<br/>
+<br/>
+ちなみに同じ事をmono on Macでやると・・・<br/>
+<br/>
+<figure id="code20-4"><pre><code class="samp">
+$ mono ikvm.exe  -jar JavaTest.jar 
+Hello World!
+</code></pre></figure>
+<br/>
+より良く変態しているのが分かりますね！！<br/>
+<br/>
+<h2>IKVMC</h2><br/>
+<br/>
+これが割りと本格的なJava → .NETのバイナリ変換器です。と入ってもJavaコード自体はバイナリ変換しておらず（多分）、単純にIKVM上で実行するラッパーを生成します。ですのでIKVM系のライブラリがないと単体では動かない、という事態になります。それではさっきの例でやってみるとこんな感じになります。<br/>
+<br/>
+<figure id="code20-4"><pre><code class="samp">
+&gt;ikvmc JavaTest.jar
+IKVM.NET Compiler version 7.2.4630.5
+Copyright (C) 2002-2012 Jeroen Frijters
+http://www.ikvm.net/
+
+note IKVMC0004: Using main class &quot;javatest.JavaTest&quot; based on jar manifest
+note IKVMC0002: Output file is &quot;JavaTest.exe&quot;
+</code></pre></figure>
+<br/>
+これでexeができました。これを普通に起動すると・・・<br/>
+<br/>
+<figure id="code20-5"><pre><code class="samp">
+E:\Desktop\ikvm-7.2.4630.5\bin&gt;JavaTest.exe
+Hello World!
+</code></pre></figure>
+<br/>
+となります。<br/>
+<br/>
+ん？そんなちっちゃいのだとなにがなんだかわからないって？んじゃあもっとでかいのを試してみましょうか・・・。<br/>
+<br/>
+えーと、ここに良さ気なでかいソースがありますね！！そいじゃ早速・・・<br/>
+<br/>
+<figure id="code20-6"><pre><code class="samp">
+&gt;ikvmc -target:library  groovy-all-2.0.5.jar
+</code></pre></figure>
+<br/>
+とんでもない量の警告が出ますがめげずに待つとgroovy-all-2.0.5.dllというバイナリができます。なんだこれ。<br/>
+<br/>
+C#プロジェクト作って、作ったdllに参照を貼り、以下の様なコードを書いてやりましょう！<br/>
+<br/>
+<figure id="code20-7"><pre><code class="csharp">
+using System;
+using groovy.lang;
+using jInt = java.lang.Integer;
+
+namespace Groovy.net
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var binding = new Binding();
+            binding.setVariable(&quot;foo&quot;, new jInt(2));
+            var shell = new GroovyShell(binding);
+            Console.WriteLine(shell.evaluate(
+        　　　　&quot;println &apos;Hello World&apos;; x = 123; return x * foo&quot;));
+            Console.ReadLine();
+        }
+    }
+}
+</code></pre></figure>
+<br/>
+<figure id="code20-8"><pre><code class="samp">
+    Hello World
+    246
+</code></pre></figure>
+<br/>
+動いてるように見えなくもない。<br/>
+<br/>
+・・・<a href="http://docs.codehaus.org/display/GROOVY/Running+Groovy+on+.NET+2.0+using+IKVM">昔(1.5くらいの時)はInteractiveShellが起動できたみたいなんですが</a>今(2.0.5)はv無理なので、<a href="http://padcom13.blogspot.jp/2010/12/groovy-scripting-from-c.html">こちらの記事</a>を参考にしてみました。<br/>
+<br/>
+<h2>IKVMSTUB</h2><br/>
+<br/>
+これはIKVMCと全く真逆で、.NETコードへのスタブとなるJavaコードを自動生成してくれます。これは結構記事が出ているので、以下あたりを参照してみてください。<br/>
+<br/>
+<ul>
+<li><a href="http://d.hatena.ne.jp/liner_lock/20110603/1307106765">d:id:liner_lock:20110603:1307106765</a></li>
+</ul>
+<br/>
+・・・ちなみにこれをロードしちゃうと、Javaのくせに.NET環境下でしか立ち上がらないという不思議な状態になります*5<br/>
+<br/>
+<h2>おしまい</h2><br/>
+<br/>
+IKVM自体は超強力なライブラリで、各種JavaコンポーネントがIKVMを使って.NETポーティングされているプロジェクトはかなりの数あるはずです。Javaが強力な分野は多いですから、性能に配慮しつつ美味しく使っていくべきでしょうね。<br/>
+<br/>
+あとはガチでJava→C#のコンバートをするものとかもあるのですが時間切れ！ここらへんは個人的にも興味あるので宿題ですね。<br/>
+<br/>
+次はzerosum_さんです！<br/>
+<br/>
+*1:というか僕知らないのですよ、J#。本格的にプログラムはじめたのはVS2008以降なので・・・<br/>
+<br/>
+*2:そもそもJavaではないらしいし。<br/>
+<br/>
+*3:所謂NTR。<br/>
+<br/>
+*4:NTRより純な感じが好きです。ハイ。<br/>
+<br/>
+*5:『堕ちた女戦士』といった感じですね<br/>
+<br/>
+
+</body>
+</html>
+

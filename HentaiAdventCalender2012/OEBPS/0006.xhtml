@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<title>day05</title>
+<link rel="stylesheet" href="css/default.css" type="text/css" />
+</head>
+<body>
+<h3>day05</h3>
+<h1>世界を変態で埋め尽くせ！！</h1><br/>
+<a href="http://atnd.org/events/33835">変態アドベントカレンダー</a>5日目担当のはがねのつるぎです。<br/>
+昨日は<a href="https://twitter.com/Kuchitama">@kuchitama</a>さんのでした「<a href="http://d.hatena.ne.jp/kuchitama/20121204/p1">Vimを変態にしてみた</a>」でした。<br/>
+<br/>
+three.jsを使って3D空間に変態を敷き詰めていこうと思います。<br/>
+<br/>
+3Dプログラミングは色々と手順があります。まずは、レンダラーとシーンを設定して変態空間を作ります。レンダラーとは世界の描き方のこと。変態空間がどのようにみえるか？を決定します。たとえるなら生物でいう眼の構造みたいなものでしょうか。せっかくなのでWebGLを使ってみます。<br/>
+<figure id="code5-1"><pre><code class="javascript">
+// レンダラー
+var renderer = new THREE.WebGLRenderer({ antialias:true });
+// 画像サイズ
+renderer.setSize(500 , 500);
+renderer.setClearColorHex(0x000000, 1);
+// DOMに追加
+document.body.appendChild(renderer.domElement);
+</code></pre></figure>
+<br/>
+シーンは世界そのものです。このシーンにオブジェクトを追加して変態化を進めていきます。<br/>
+<figure id="code5-2"><pre><code class="javascript">
+// シーン
+var scene = new THREE.Scene();
+</code></pre></figure>
+<br/>
+まだ変態空間があっても見るすべがありません。<br/>
+変態と言えば覗きですね。カメラを作ります。<br/>
+<figure id="code5-3"><pre><code class="javascript">
+// カメラ
+var camera = new THREE.PerspectiveCamera(70, 500 / 500);
+// カメラの座標
+camera.position = new THREE.Vector3(0, 0, 1);
+// カメラターゲット
+camera.lookAt(new THREE.Vector3(0, 0, 0));
+scene.add(camera);
+</code></pre></figure>
+<br/>
+まだ変態空間は暗闇に包まれています。変態に光あれ。<br/>
+<figure id="code5-4"><pre><code class="javascript">
+// ライト
+var light = new THREE.DirectionalLight(0xcccccc);
+// ライト座標
+light.position = new THREE.Vector3(0.577, 0.577, 0.577);
+scene.add(light);
+// 環境光
+var ambient = new THREE.AmbientLight(0x333333);
+scene.add(ambient);
+</code></pre></figure>
+<br/>
+ここからが本編です。<br/>
+変態を敷き詰めるためにパーティクルシステムを使います。<br/>
+パーティクルシステムはCGでよくある爆発や煙なんかを表現するのに便利な技術です。<br/>
+<br/>
+まずは、コアとなるオブジェクトと変態を出現させる座標をランダムで作っていきます。<br/>
+<figure id="code5-5"><pre><code class="javascript">
+// 形状データを作成
+var geometry = new THREE.Geometry();
+var numParticles = 500;
+for(var i = 0 ; i &lt; numParticles ; i++) {
+    // 座標をセット
+    geometry.vertices.push(new THREE.Vector3(
+    Math.random() * 2000 - 1000,
+    Math.random() * 2000 - 1000,
+    Math.random() * 2000 - 1000));
+}
+</code></pre></figure>
+<br/>
+座標に割り当てる変態を作成します。<br/>
+<figure id="code5-6"><pre><code class="javascript">
+// マテリアルを作成
+var texture =THREE.ImageUtils.loadTexture(&apos;hentai.png&apos;);
+var material = new THREE.ParticleBasicMaterial({
+    size: 200, color: 0xffffff, blending: THREE.AdditiveBlending,
+    transparent: false, depthTest: false, map: texture });
+</code></pre></figure>
+<br/>
+パーティクルを使って変態を出現させます。<br/>
+<figure id="code5-7"><pre><code class="javascript">
+// 物体を作成
+var mesh = new THREE.ParticleSystem(geometry, material);
+mesh.position = new THREE.Vector3(0, 0, -1200);
+mesh.sortParticles = true;
+scene.add(mesh);
+</code></pre></figure>
+<br/>
+実行すると変態空間の完成です。<br/>
+<br/>
+<img src="images/result.png" alt="変態空間" /><br/>
+<br/>
+ここまでで、変態空間は完成ですがせっかくなので動かしてみました。<br/>
+初期化が大変みたいでChromeでも、あんまりまともに動きません。<br/>
+<br/>
+<a href="http://haganemetal.net/work/sample/p.html">デモ</a>　※Chrome推奨<br/>
+<br/>
+最先端すぎてブラウザでさえついてこれないのがはがねクオリティーです。<br/>
+<br/>
+明日は<a href="https://twitter.com/ponkore">@ponkore</a>さんです。よろしくお願いします。<br/>
+<br/>
+
+</body>
+</html>
+
